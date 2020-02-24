@@ -29,10 +29,19 @@
 
 	fixed4 frag(v2f i) : SV_Target
 	{
+		
 		return fixed4(
-			saturate(_StyleCount),
+			(_StyleCount),
 			(float)_StyleId / (_StyleCount - 1),
 			0,1);
+			
+		
+		/*
+		return fixed4(
+			(_StyleCount),
+			(float)_StyleId / 10.f,
+			0,1);
+		*/
 	}
 
 	ENDCG

@@ -13,6 +13,13 @@
 
         Pass
         {
+
+			//Stencil {
+			//	Ref [_StyleId]
+			//	Comp always
+			//	Pass replace
+			//}
+
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag

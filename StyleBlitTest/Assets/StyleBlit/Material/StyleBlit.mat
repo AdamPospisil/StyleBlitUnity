@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: StyleBlit
-  m_Shader: {fileID: 4800000, guid: f5088083029fba24da0b87b378fb8ade, type: 3}
+  m_Shader: {fileID: 4800000, guid: 8cdb75432ec899543b0cf30e50b413f5, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -80,7 +80,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - sourceStyle:
-        m_Texture: {fileID: 2800000, guid: d00b56c6196b67841b69f7dab7598b68, type: 3}
+        m_Texture: {fileID: 2800000, guid: 89ffa0c516ba19047859579e614ac8b1, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - targetNormals:
@@ -110,7 +110,7 @@ Material:
     - _splitCo: 10
     - _threshold: 0.07
     - _useNormalMap: 0
-    - _votespan: 2.09
+    - _votespan: 2.34
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

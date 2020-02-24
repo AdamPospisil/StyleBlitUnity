@@ -48,6 +48,15 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
 #endif
     }
 
+    void OnApplicationQuit()
+    {
+        if (maskingCamera)
+        {
+            DestroyImmediate(maskingCamera);
+        }
+        CreateMaskingCamera();
+    }
+
     void Start()
     {
         //Shader materialIdShader = Shader.Find("Unlit/MaterialID");
@@ -67,6 +76,8 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
         int h = StyleTextures[0].height;
 
         Texture2DArray stylesArray = new Texture2DArray(w, h, StyleTextures.Length, StyleTextures[0].format, false, false);
+        stylesArray.filterMode = FilterMode.Point;
+        stylesArray.wrapMode = TextureWrapMode.Repeat;
         for (int i = 0; i < StyleTextures.Length; i++)
         {
             for (int j = 0; j < StyleTextures[i].mipmapCount; j++)
@@ -91,7 +102,7 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
         // masking camera is not set and it either has no parent or if there is a parent it does not have StyleBlitMultiImageEffect component
         if (!maskingCamera && (!transform.parent || !transform.parent.GetComponent<StyleBlitMultiImageEffect>()))
         {
-            //CreateMaskingCamera();
+            CreateMaskingCamera();
         }
     }
 

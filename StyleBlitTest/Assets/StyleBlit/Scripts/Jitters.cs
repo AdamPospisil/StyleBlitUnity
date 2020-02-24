@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
 
-// script for continuous jitter rendering and fps capping
+// script for continuous jitter rendering nad fps capping
 [DisallowMultipleComponent]
 public class Jitters : MonoBehaviour
 {

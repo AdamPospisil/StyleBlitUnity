@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 [RequireComponent(typeof(Renderer))]
@@ -7,13 +8,14 @@ using UnityEngine;
 public class StyleIDScript : MonoBehaviour
 {    
     public int StyleId;
-    // Start is called before the first frame update
+   
     void Start()
     {
         foreach (Material m in GetComponent<Renderer>().materials)
         {
             m.SetInt("_StyleId", StyleId);
         }
+
     }
 
     private void OnDisable()
@@ -32,7 +34,6 @@ public class StyleIDScript : MonoBehaviour
             m.SetInt("_StyleCount", FindObjectOfType<StyleBlitMultiImageEffect>().StyleTextures.Length);
         }
     }
-
 
 
     // Update is called once per frame

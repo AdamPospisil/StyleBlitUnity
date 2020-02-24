@@ -8,12 +8,12 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: StyleBlitB
-  m_Shader: {fileID: 4800000, guid: 66ecced0bdce105479ce37f672576824, type: 3}
+  m_Shader: {fileID: 4800000, guid: 60fccd9e908e29041aed610f5c45950e, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
+  m_CustomRenderQueue: 2001
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:

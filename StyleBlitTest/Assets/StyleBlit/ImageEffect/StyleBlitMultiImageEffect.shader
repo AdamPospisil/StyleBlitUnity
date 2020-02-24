@@ -220,7 +220,6 @@
 				}
 			}
 
-			//Our Fragment Shader
 			half4 frag(v2f input) : COLOR
 			{
 				int levels = _splatsize;
@@ -322,8 +321,6 @@
 			sampler2D _CameraDepthNormalsTexture;
 			float4 _CameraDepthNormalsTexture_TexelSize;
 
-			float4 _bgColor;
-
 			float _votespan;
 			float _splitCo;
 
@@ -338,20 +335,6 @@
 				pattern.xy /= konf;
 
 				return pattern.xy;
-			}
-
-			// tells whether pixel is part of the background
-			bool isBG(float2 pos)
-			{
-				float4 depthNormal = tex2D(_CameraDepthNormalsTexture, pos);
-				float depthValue;
-				float3 normalValues;
-				DecodeDepthNormal(depthNormal, depthValue, normalValues);
-
-				if (depthValue > 1.f)
-					return true;
-				else
-					return false;
 			}
 
 			// performs averaging of the final transfer pixel contribution in votespan vicinity
@@ -371,50 +354,41 @@
 				int w = 0;
 				int vic = _votespan;
 
-				float2 tnt = pos.xy / styleMask_TexelSize.zw;
-				float stylo = tex2Dlod(styleMask, float4(tnt.x, tnt.y, 0.f, 0.f)).r;
-
-				bool ok = true;
+				float stylo = tex2D(styleMask, pos.xy / styleMask_TexelSize.zw).r;
+			
+				//true for non-styled area
+				bool env = true;
 
 				for (int x = -vic; x <= vic; x++)
 				{
-					[unroll(16)]
 					for (int y = -vic; y <= vic; y++)
 					{
-						float2 tt = float2(pos.x + x, pos.y + y) / _MainTex_TexelSize.zw;
 
-						float2 coords = recon(tex2Dlod(_MainTex, float4(tt.x, tt.y, 0.f, 0.f)));
-						//coords *= sourceStyle_TexelSize.zw;
+						float2 coords = recon(tex2D(_MainTex, float2(pos.x + x, pos.y + y) / _MainTex_TexelSize.zw));
 						coords *= sourceStyles_TexelSize.zw;
 						coords -= float2(x, y);
 
-						//if (isBG(float2(pos.x + x, pos.y + y) / _CameraDepthNormalsTexture_TexelSize.zw)) {
+						float2 maskpos = float2(pos.x + x, pos.y + y) / styleMask_TexelSize.zw;
 
-						float2 npos = float2(pos.x + x, pos.y + y) / styleMask_TexelSize.zw;
-
-						if (tex2Dlod(styleMask, float4(npos.x, npos.y, 0.f, 0.f)).r < 0.05f ) {
-							//color += _bgColor;
-							color += tex2Dlod(_MainTex, float4(npos.x, npos.y, 0.f, 0.f));
+						if (tex2Dlod(styleMask, float4(maskpos.x, maskpos.y, 0.f, 0.f)).r < 0.05f) {
+							color += tex2D(_MainTex, float2(pos.x + x, pos.y + y) / _MainTex_TexelSize.zw);
 						}
 						else {
-							ok = false;
-							//color += tex2Dlod(sourceStyle, float4(coords.xy / sourceStyle_TexelSize.zw, 0.f, 0.f));
-							//color += tex2Dlod(sourceStyle, float4(npos.x, npos.y, 0.f, 0.f));	
-							int styleId = tex2Dlod(styleMask, float4(npos.x, npos.y, 0.f, 0.f)).g * styleCount;
-							color += UNITY_SAMPLE_TEX2DARRAY(sourceStyles, float3(coords.xy / sourceStyles_TexelSize.zw, styleId));
+							int styleId = tex2Dlod(styleMask, float4(maskpos.x, maskpos.y, 0.f, 0.f)).g * styleCount - 1;
+							color += UNITY_SAMPLE_TEX2DARRAY_LOD(sourceStyles, float3(coords.xy / sourceStyles_TexelSize.zw, styleId), float2(0.f, 0.f));
+							env = false;
 						}
 						w++;
 					}
 				}
-				if (ok)
-				//if (false)
+
+				if (env)
 				{
-					return tex2Dlod(_MainTex, float4(tnt.x, tnt.y, 0.f, 0.f));
+					return tex2D(_MainTex, pos.xy / styleMask_TexelSize.zw);
 				}
-				else {
-					float4 smooth = color / w;
-					return smooth;
-				}
+
+				float4 smooth = color / w;
+				return smooth;
 			}
 			ENDCG
 		}

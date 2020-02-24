@@ -1,8 +1,11 @@
 fileFormatVersion: 2
-guid: 188a8fea4fcd8df4db25d6bcdf4ff456
+guid: 0c879bc2203c9fb45907c539ceadbb94
 ShaderImporter:
   externalObjects: {}
-  defaultTextures: []
+  defaultTextures:
+  - normalToSourceLUT: {fileID: 2800000, guid: 15eb915eae5cb7b47988d5ae0710f848, type: 3}
+  - sourceNormals: {fileID: 2800000, guid: d8502acceaa329e4186bed6f39207494, type: 3}
+  - noiseTexture: {fileID: 2800000, guid: 1c7cf252522eefa4a86df805cb5536c7, type: 3}
   nonModifiableTextures: []
   userData: 
   assetBundleName: 

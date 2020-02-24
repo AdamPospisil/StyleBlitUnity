@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: StyleBlitA
-  m_Shader: {fileID: 4800000, guid: 188a8fea4fcd8df4db25d6bcdf4ff456, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0c879bc2203c9fb45907c539ceadbb94, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
