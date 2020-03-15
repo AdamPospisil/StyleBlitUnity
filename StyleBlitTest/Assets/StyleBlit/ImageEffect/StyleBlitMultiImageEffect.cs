@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9,8 +10,11 @@ using UnityEditor;
 [DefaultExecutionOrder(2)]
 public class StyleBlitMultiImageEffect : MonoBehaviour
 {
+    public const string STYLE_TEXTURE_FOLDER = "Assets/StyleBlit/Material/StyleTextures/";
+    public const string STYLE_TEXTURE_PREFIX = "source_";
+
     private Shader shader;
-    //public Texture2D StyleTexture;
+    public Texture2DArray stylesArray;
     public Texture2D[] StyleTextures;
     public Texture2D LUTTexture;
     public Texture2D SourceNormalTexture;
@@ -23,8 +27,6 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
     [Range(0.0f, 5.0f)]
     public float Smoothness = 2.0f;
 
-    //public Color BackgroundColor = Color.white;
-
     private Material _material;
 
     private void Reset()
@@ -33,40 +35,40 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
         LUTTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/StyleBlit/Material/Shader/Textures/lut.png", typeof(Texture2D));
         SourceNormalTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/StyleBlit/Material/Shader/Textures/s_normals.png", typeof(Texture2D));
         NoiseTexture = (Texture2D)AssetDatabase.LoadAssetAtPath("Assets/StyleBlit/Material/Shader/Textures/jitter.png", typeof(Texture2D));
-        int styleCnt = 7;
+        int styleCnt = Directory.GetFiles(STYLE_TEXTURE_FOLDER, STYLE_TEXTURE_PREFIX + "*.png").Length;
         StyleTextures = new Texture2D[styleCnt];
         for(int i = 0; i < styleCnt; i++)
         {
             string stylePath = string.Format("Assets/StyleBlit/Material/StyleTextures/source_{0}.png", i + 1);
             StyleTextures[i] = (Texture2D)AssetDatabase.LoadAssetAtPath(stylePath, typeof(Texture2D));
         }
+
         if (maskingCamera)
         {
             DestroyImmediate(maskingCamera);
         }
         CreateMaskingCamera();
+        GetComponent<Camera>().depthTextureMode = DepthTextureMode.DepthNormals;
 #endif
     }
 
     void OnApplicationQuit()
     {
-        if (maskingCamera)
-        {
-            DestroyImmediate(maskingCamera);
-        }
-        CreateMaskingCamera();
+#if UNITY_EDITOR
+        AssetDatabase.CreateAsset(stylesArray, "Assets/StyleBlit/Material/Resources/StylesArray.asset");
+#endif
     }
 
     void Start()
     {
-        //Shader materialIdShader = Shader.Find("Unlit/MaterialID");
+#if UNITY_EDITOR
+
         foreach (Renderer r in FindObjectsOfType<Renderer>())
         {
             foreach (Material m in r.sharedMaterials)
             {
                 if (m.HasProperty("_StyleId"))
                 {
-                    //Debug.Log(m.name);
                     m.SetInt("_StyleCount", StyleTextures.Length);
                 }
             }
@@ -75,7 +77,7 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
         int w = StyleTextures[0].width;
         int h = StyleTextures[0].height;
 
-        Texture2DArray stylesArray = new Texture2DArray(w, h, StyleTextures.Length, StyleTextures[0].format, false, false);
+        stylesArray = new Texture2DArray(w, h, StyleTextures.Length, StyleTextures[0].format, false, false);
         stylesArray.filterMode = FilterMode.Point;
         stylesArray.wrapMode = TextureWrapMode.Repeat;
         for (int i = 0; i < StyleTextures.Length; i++)
@@ -86,6 +88,7 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
             }
         }
         stylesArray.Apply(false, false);
+#endif
 
         GetComponent<Camera>().depthTextureMode = DepthTextureMode.DepthNormals;
         if (_material == null)
@@ -99,11 +102,11 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
 
         SetParams();
 
-        // masking camera is not set and it either has no parent or if there is a parent it does not have StyleBlitMultiImageEffect component
-        if (!maskingCamera && (!transform.parent || !transform.parent.GetComponent<StyleBlitMultiImageEffect>()))
+        if (maskingCamera)
         {
-            CreateMaskingCamera();
+            DestroyImmediate(maskingCamera);
         }
+        CreateMaskingCamera();
     }
 
     void Update()
@@ -122,7 +125,7 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
         source.format);
 
         _material.SetTexture("styleMask", StyleMask);
-        Graphics.Blit(source, temp, _material, 0);        
+        Graphics.Blit(source, temp, _material, 0);
         Graphics.Blit(temp, destination, _material, 1);
         //Graphics.Blit(source, destination, _material, 0);
         RenderTexture.ReleaseTemporary(temp);
@@ -167,8 +170,6 @@ public class StyleBlitMultiImageEffect : MonoBehaviour
     {
         _material.SetFloat("_threshold", Fragmentation);
         _material.SetFloat("_votespan", Smoothness);
-        //_material.SetColor("_bgColor", BackgroundColor);
-        //_material.SetTexture("sourceStyle", StyleTexture);
         _material.SetTexture("normalToSourceLUT", LUTTexture);
         _material.SetTexture("sourceNormals", SourceNormalTexture);
         _material.SetTexture("noiseTexture", NoiseTexture);
